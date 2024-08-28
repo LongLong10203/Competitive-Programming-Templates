@@ -4,24 +4,16 @@ using namespace std;
 class Combinatorics {
 private:
     vector<long long> factMemo;
-    vector<vector<long long>> nCrMemo;
+    vector<long long> invFactMemo;
     long long MOD;
 
-    long long fact(int n) {
-        if (n == 0 || n == 1) return 1;
-        if (factMemo[n] != -1) return factMemo[n];
-        return factMemo[n] = (n * fact(n - 1)) % MOD;
-    }
-
-    long long _nCr(int n, int r) {
-        if (r > n) return 0;
-        if (r == 0 || r == n) return 1;
-        if (nCrMemo[n][r] != -1) return nCrMemo[n][r];
-        return nCrMemo[n][r] = (fact(n) * modInverse(fact(r)) % MOD * modInverse(fact(n - r)) % MOD) % MOD;
-    }
-
-    long long modInverse(long long a) {
-        return power(a, MOD - 2);
+    void precompute(int maxN) {
+        factMemo[0] = 1;
+        for (int i = 1; i <= maxN; ++i)
+            factMemo[i] = (factMemo[i - 1] * i) % MOD;
+        invFactMemo[maxN] = power(factMemo[maxN], MOD - 2);
+        for (int i = maxN - 1; i >= 0; --i)
+            invFactMemo[i] = (invFactMemo[i + 1] * (i + 1)) % MOD;
     }
 
     long long power(long long x, long long y) {
@@ -37,16 +29,18 @@ private:
 
 public:
     Combinatorics(int maxN, long long mod) : MOD(mod) {
-        factMemo.resize(maxN + 1, -1);
-        nCrMemo.resize(maxN + 1, vector<long long>(maxN + 1, -1));
+        factMemo.resize(maxN + 1);
+        invFactMemo.resize(maxN + 1);
+        precompute(maxN);
     }
 
     long long factorial(int n) {
-        return fact(n);
+        return factMemo[n];
     }
 
     long long nCr(int n, int r) {
-        return _nCr(n, r);
+        if (r > n) throw invalid_argument("r > n");
+        return (factMemo[n] * invFactMemo[r] % MOD * invFactMemo[n - r] % MOD) % MOD;
     }
 };
 
