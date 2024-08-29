@@ -14,7 +14,7 @@ public:
     }
 
     T query(int l, int r) const {
-        return prefix[r] - prefix[l];
+        return prefix[r + 1] - prefix[l];
     }
 };
 

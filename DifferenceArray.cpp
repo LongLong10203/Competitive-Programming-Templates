@@ -28,7 +28,7 @@ public:
             result[i] = result[i - 1] + diff[i];
         return result;
     }
-}; // * Note: 0-based index
+};
 
 int main() {
     

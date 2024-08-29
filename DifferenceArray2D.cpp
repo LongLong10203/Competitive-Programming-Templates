@@ -39,7 +39,7 @@ public:
         }
         return res;
     }
-}; // * Note: 0-based index
+};
 
 int main() {
     
