@@ -31,16 +31,5 @@ public:
 }; // * Note: 0-based index
 
 int main() {
-    int n, q;
-    cin >> n >> q;
-    DifferenceArray<int> diff(vector<int>(n, 0));
-    while (q--) {
-        int l, r, v;
-        cin >> l >> r >> v;
-        diff.increment(l-1, r-1, v);
-    }
-    vector<int> res = diff.get();
-    for (int i : res)
-        cout << i << " ";
-    cout << endl;
+    
 }

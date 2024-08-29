@@ -48,7 +48,7 @@ private:
             node->right = deleteNode(node->right, low, high);
         }
 
-        if (node) node->max = max(node->high, max(getMax(node->left), getMax(node->right)));
+        node->max = max(node->high, max(getMax(node->left), getMax(node->right)));
         return node;
     }
 
@@ -88,6 +88,10 @@ public:
         Node* res = searchOverlap(root, low, high);
         if (res) return {res->low, res->high};
         return {numeric_limits<T>::min(), numeric_limits<T>::min()};
+    }
+
+    bool overlap(T low, T high) {
+        return searchOverlap(root, low, high) != nullptr;
     }
 };
 

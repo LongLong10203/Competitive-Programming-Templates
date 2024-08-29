@@ -11,3 +11,6 @@ template <class T> ostream &operator<<(ostream &os, const vector<T> &v) {
     return os;
 }
 
+int main() {
+    
+}
