@@ -1,61 +1,51 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template <typename T>
 class Kosaraju {
-    int V; // Number of vertices
-    vector<vector<int>> adj; // Adjacency list
+private:
+    int n;
+    vector<vector<T>> adj, radj;
+    vector<bool> visited;
+    vector<int> order, component;
 
-    void fillOrder(int v, vector<bool>& visited, stack<int>& Stack) {
+    void dfs1(int v) {
         visited[v] = true;
-        for (int i : adj[v])
-            if (!visited[i])
-                fillOrder(i, visited, Stack);
-        Stack.push(v);
+        for (T u : adj[v])
+            if (!visited[u])
+                dfs1(u);
+        order.push_back(v);
     }
 
-    void DFSUtil(int v, vector<bool>& visited, vector<int>& component) {
+    void dfs2(int v) {
         visited[v] = true;
         component.push_back(v);
-        for (int i : adj[v])
-            if (!visited[i])
-                DFSUtil(i, visited, component);
-    }
-
-    Kosaraju getTranspose() {
-        Kosaraju g(V);
-        for (int v = 0; v < V; v++) {
-            for (int i : adj[v]) {
-                g.adj[i].push_back(v);
-            }
-        }
-        return g;
+        for (T u : radj[v])
+            if (!visited[u])
+                dfs2(u);
     }
 
 public:
-    Kosaraju(int V) {
-        this->V = V;
-        adj.resize(V);
-    }
+    Kosaraju(int n) : n(n), adj(n), radj(n), visited(n, false) {}
 
-    void add(int v, int w) {
-        adj[v].push_back(w);
+    void add(T u, T v) {
+        adj[u].push_back(v);
+        radj[v].push_back(u);
     }
 
     vector<vector<int>> get() {
-        stack<int> Stack;
-        vector<bool> visited(V, false);
-        for (int i = 0; i < V; i++)
+        fill(visited.begin(), visited.end(), false);
+        for (int i = 0; i < n; ++i)
             if (!visited[i])
-                fillOrder(i, visited, Stack);
-        Kosaraju gr = getTranspose();
+                dfs1(i);
+
         fill(visited.begin(), visited.end(), false);
         vector<vector<int>> sccs;
-        while (!Stack.empty()) {
-            int v = Stack.top();
-            Stack.pop();
+        for (int i = n - 1; i >= 0; --i) {
+            int v = order[i];
             if (!visited[v]) {
-                vector<int> component;
-                gr.DFSUtil(v, visited, component);
+                component.clear();
+                dfs2(v);
                 sccs.push_back(component);
             }
         }
