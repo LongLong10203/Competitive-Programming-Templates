@@ -2,7 +2,7 @@
 using namespace std;
 
 template <typename T, class Allocator = allocator<T> >
-class Treap { // modified fromhttps://codeforces.com/blog/entry/46507
+class Treap { // modified from https://codeforces.com/blog/entry/46507
 private:
     struct node;
     using pnode = struct node *;
