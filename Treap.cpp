@@ -2,7 +2,7 @@
 using namespace std;
 
 template <typename T, class Allocator = allocator<T> >
-class Treap { // https://codeforces.com/blog/entry/46507
+class Treap { // modified fromhttps://codeforces.com/blog/entry/46507
 private:
     struct node;
     using pnode = struct node *;
@@ -45,11 +45,13 @@ private:
         priority_t priority;
         int cnt, rev;
         T key, add, fsum;
+        T min_val, max_val;
         pnode l, r;
 
-        node (T x, priority_t p) {
+        node(T x, priority_t p) {
             add = 0 * x;
             key = fsum = x;
+            min_val = max_val = x;
             cnt = 1;
             rev = 0;
             l = r = nullptr;
@@ -77,26 +79,36 @@ private:
             t->cnt = cnt(t->l) + cnt(t->r) + 1;
     }
 
-    void upd_sum (pnode t) {
+    void upd_sum(pnode t) {
         if (t) {
             t->fsum = t->key;
-            if (t->l)
+            t->min_val = t->key;
+            t->max_val = t->key;
+            if (t->l) {
                 t->fsum += t->l->fsum;
-            if (t->r)
+                t->min_val = min(t->min_val, t->l->min_val);
+                t->max_val = max(t->max_val, t->l->max_val);
+            }
+            if (t->r) {
                 t->fsum += t->r->fsum;
+                t->min_val = min(t->min_val, t->r->min_val);
+                t->max_val = max(t->max_val, t->r->max_val);
+            }
         }
     }
 
-    void update (pnode t, T add, int rev) {
+    void update(pnode t, T add, int rev) {
         if (!t)
             return;
         t->add = t->add + add;
         t->rev = t->rev ^ rev;
         t->key = t->key + add;
         t->fsum = t->fsum + cnt(t) * add;
+        t->min_val = t->min_val + add;
+        t->max_val = t->max_val + add;
     }
 
-    void push (pnode t) {
+    void push(pnode t) {
         if (!t || (t->add == 0 * T() && t->rev == 0))
             return;
         update(t->l, t->add, t->rev);
@@ -107,7 +119,7 @@ private:
         t->rev = 0;
     }
 
-    void merge (pnode & t, pnode l, pnode r) {
+    void merge(pnode &t, pnode l, pnode r) {
         push(l);
         push(r);
         if (!l || !r)
@@ -358,6 +370,30 @@ private:
         t = nullptr;
     }
 
+    T get_min(pnode &t, int l, int r) {
+        pnode l1, r1;
+        split(t, l1, r1, r + 1);
+        pnode l2, r2;
+        split(l1, l2, r2, l);
+        T ret = r2->min_val;
+        pnode t2;
+        merge(t2, l2, r2);
+        merge(t, t2, r1);
+        return ret;
+    }
+
+    T get_max(pnode &t, int l, int r) {
+        pnode l1, r1;
+        split(t, l1, r1, r + 1);
+        pnode l2, r2;
+        split(l1, l2, r2, l);
+        T ret = r2->max_val;
+        pnode t2;
+        merge(t2, l2, r2);
+        merge(t, t2, r1);
+        return ret;
+    }
+
 public:
     Treap (mt19937_64 * rng = nullptr) {
         is_sorted_ = true;
@@ -505,6 +541,14 @@ public:
 
     T get_sum (int left, int right) {
         return get_sum(root_, left, right);
+    }
+
+    T get_min(int left, int right) {
+        return get_min(root_, left, right);
+    }
+
+    T get_max(int left, int right) {
+        return get_max(root_, left, right);
     }
 };
 
