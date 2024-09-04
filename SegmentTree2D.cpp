@@ -4,109 +4,110 @@ using namespace std;
 template <typename T>
 class SegmentTree2D {
 private:
-    vector<vector<T>> tree, data;
     int n, m;
+    vector<vector<T>> arr;
+    vector<vector<T>> segTree;
 
-    T combine(T a, T b) {
-        return a + b; // modify this
+    T combine(T left, T right) {
+        return left + right;  // Change this
     }
 
-    void build_y(int x, int lx, int rx, int y, int ly, int ry) {
-        if (ly == ry) {
-            if (lx == rx)
-                tree[x][y] = data[lx][ly];
+    void buildY(int nodeX, int startX, int endX, int nodeY, int startY, int endY) {
+        if (startY == endY) {
+            if (startX == endX)
+                segTree[nodeX][nodeY] = arr[startX][startY];
             else
-                tree[x][y] = combine(tree[2*x][y], tree[2*x+1][y]);
+                segTree[nodeX][nodeY] = combine(segTree[2 * nodeX + 1][nodeY], segTree[2 * nodeX + 2][nodeY]);
         } else {
-            int my = (ly + ry) / 2;
-            build_y(x, lx, rx, 2*y, ly, my);
-            build_y(x, lx, rx, 2*y+1, my+1, ry);
-            tree[x][y] = combine(tree[x][2*y], tree[x][2*y+1]);
+            int midY = (startY + endY) / 2;
+            buildY(nodeX, startX, endX, 2 * nodeY + 1, startY, midY);
+            buildY(nodeX, startX, endX, 2 * nodeY + 2, midY + 1, endY);
+            segTree[nodeX][nodeY] = combine(segTree[nodeX][2 * nodeY + 1], segTree[nodeX][2 * nodeY + 2]);
         }
     }
 
-    void build_x(int x, int lx, int rx) {
-        if (lx != rx) {
-            int mx = (lx + rx) / 2;
-            build_x(2*x, lx, mx);
-            build_x(2*x+1, mx+1, rx);
+    void buildX(int nodeX, int startX, int endX) {
+        if (startX != endX) {
+            int midX = (startX + endX) / 2;
+            buildX(2 * nodeX + 1, startX, midX);
+            buildX(2 * nodeX + 2, midX + 1, endX);
         }
-        build_y(x, lx, rx, 1, 0, m-1);
+        buildY(nodeX, startX, endX, 0, 0, m - 1);
     }
 
-    T query_y(int x, int y, int ly, int ry, int qly, int qry) {
-        if (qly == ly && qry == ry)
-            return tree[x][y];
-        int my = (ly + ry) / 2;
-        if (qry <= my)
-            return query_y(x, 2*y, ly, my, qly, qry);
-        else if (qly > my)
-            return query_y(x, 2*y+1, my+1, ry, qly, qry);
+    T queryY(int idxY, int startY, int endY, int lY, int rY, int nodeX) {
+        if (lY == startY && rY == endY)
+            return segTree[nodeX][idxY];
+        int midY = (startY + endY) / 2;
+        if (rY <= midY)
+            return queryY(2 * idxY + 1, startY, midY, lY, rY, nodeX);
+        else if (lY > midY)
+            return queryY(2 * idxY + 2, midY + 1, endY, lY, rY, nodeX);
         else
             return combine(
-                query_y(x, 2*y, ly, my, qly, my),
-                query_y(x, 2*y+1, my+1, ry, my+1, qry)
+                queryY(2 * idxY + 1, startY, midY, lY, midY, nodeX),
+                queryY(2 * idxY + 2, midY + 1, endY, midY + 1, rY, nodeX)
             );
     }
 
-    T query_x(int x, int lx, int rx, int qlx, int qrx, int qly, int qry) {
-        if (qlx == lx && qrx == rx)
-            return query_y(x, 1, 0, m-1, qly, qry);
-        int mx = (lx + rx) / 2;
-        if (qrx <= mx)
-            return query_x(2*x, lx, mx, qlx, qrx, qly, qry);
-        else if (qlx > mx)
-            return query_x(2*x+1, mx+1, rx, qlx, qrx, qly, qry);
-        else {
+    T queryX(int idxX, int startX, int endX, int lX, int rX, int lY, int rY) {
+        if (lX == startX && rX == endX)
+            return queryY(0, 0, m - 1, lY, rY, idxX);
+        int midX = (startX + endX) / 2;
+        if (rX <= midX)
+            return queryX(2 * idxX + 1, startX, midX, lX, rX, lY, rY);
+        else if (lX > midX)
+            return queryX(2 * idxX + 2, midX + 1, endX, lX, rX, lY, rY);
+        else
             return combine(
-                query_x(2*x, lx, mx, qlx, mx, qly, qry),
-                query_x(2*x+1, mx+1, rx, mx+1, qrx, qly, qry)
+                queryX(2 * idxX + 1, startX, midX, lX, midX, lY, rY),
+                queryX(2 * idxX + 2, midX + 1, endX, midX + 1, rX, lY, rY)
             );
-        }
     }
 
-    void update_y(int x, int lx, int rx, int y, int ly, int ry, int uy, T val) {
-        if (ly == ry) {
-            if (lx == rx)
-                tree[x][y] = val;
+    void updateY(int nodeX, int startX, int endX, int nodeY, int startY, int endY, int y, T value) {
+        if (startY == endY) {
+            if (startX == endX)
+                segTree[nodeX][nodeY] = value;
             else
-                tree[x][y] = combine(tree[2*x][y], tree[2*x+1][y]);
+                segTree[nodeX][nodeY] = combine(segTree[2 * nodeX + 1][nodeY], segTree[2 * nodeX + 2][nodeY]);
         } else {
-            int my = (ly + ry) / 2;
-            if (uy <= my)
-                update_y(x, lx, rx, 2*y, ly, my, uy, val);
+            int midY = (startY + endY) / 2;
+            if (y <= midY)
+                updateY(nodeX, startX, endX, 2 * nodeY + 1, startY, midY, y, value);
             else
-                update_y(x, lx, rx, 2*y+1, my+1, ry, uy, val);
-            tree[x][y] = combine(tree[x][2*y], tree[x][2*y+1]);
+                updateY(nodeX, startX, endX, 2 * nodeY + 2, midY + 1, endY, y, value);
+            segTree[nodeX][nodeY] = combine(segTree[nodeX][2 * nodeY + 1], segTree[nodeX][2 * nodeY + 2]);
         }
     }
 
-    void update_x(int x, int lx, int rx, int ux, int uy, T val) {
-        if (lx != rx) {
-            int mx = (lx + rx) / 2;
-            if (ux <= mx)
-                update_x(2*x, lx, mx, ux, uy, val);
+    void updateX(int nodeX, int startX, int endX, int x, int y, T value) {
+        if (startX != endX) {
+            int midX = (startX + endX) / 2;
+            if (x <= midX)
+                updateX(2 * nodeX + 1, startX, midX, x, y, value);
             else
-                update_x(2*x+1, mx+1, rx, ux, uy, val);
+                updateX(2 * nodeX + 2, midX + 1, endX, x, y, value);
         }
-        update_y(x, lx, rx, 1, 0, m-1, uy, val);
+        updateY(nodeX, startX, endX, 0, 0, m - 1, y, value);
     }
 
 public:
-    SegmentTree2D(const vector<vector<T>>& input_data) {
-        data = input_data;
-        n = data.size();
-        m = data[0].size();
-        tree.resize(4 * n, vector<T>(4 * m));
-        build_x(1, 0, n-1);
+    SegmentTree2D(const vector<vector<T>>& input) {
+        n = input.size();
+        m = input[0].size();
+        arr = input;
+        segTree.resize(4 * n, vector<T>(4 * m));
+        buildX(0, 0, n - 1);
     }
 
-    T query(int qlx, int qrx, int qly, int qry) {
-        return query_x(1, 0, n-1, qlx, qrx, qly, qry);
+    T query(int x1, int y1, int x2, int y2) {
+        return queryX(0, 0, n - 1, x1, x2, y1, y2);
     }
 
-    void update(int ux, int uy, T val) {
-        update_x(1, 0, n-1, ux, uy, val);
+    void update(int x, int y, T value) {
+        arr[x][y] = value;
+        updateX(0, 0, n - 1, x, y, value);
     }
 }; // * Note: 0-based index
 
