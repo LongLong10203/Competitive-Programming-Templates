@@ -3,11 +3,12 @@ using namespace std;
 
 template<typename T>
 class Power {
-private:
+public:
     T base;
     T exponent;
 
-public:
+    Power() : base(0), exponent(0) {}  // Default constructor
+
     Power(T base, T exponent) : base(base), exponent(exponent) {}
 
     double logValue() const {
