@@ -8,86 +8,95 @@ private:
     vector<T> tree, lazyAdd, lazySet;
     vector<bool> hasLazySet;
 
-    void build(const vector<T>& arr, int v, int tl, int tr) {
-        if (tl == tr) {
-            tree[v] = arr[tl];
+    T combine(T left, T right) {
+        return left + right; // only plus operation is supported
+    }
+
+    void push(int idx, int l, int r) {
+        if (hasLazySet[idx]) {
+            applySet(idx * 2, l, (l + r) / 2, lazySet[idx]);
+            applySet(idx * 2 + 1, (l + r) / 2 + 1, r, lazySet[idx]);
+            lazySet[idx] = 0;
+            hasLazySet[idx] = false;
+        }
+
+        if (lazyAdd[idx] != 0) {
+            applyAdd(idx * 2, l, (l + r) / 2, lazyAdd[idx]);
+            applyAdd(idx * 2 + 1, (l + r) / 2 + 1, r, lazyAdd[idx]);
+            lazyAdd[idx] = 0;
+        }
+    }
+
+    void applyAdd(int idx, int l, int r, T addVal) {
+        tree[idx] += addVal * (r - l + 1);
+        if (l != r) {
+            lazyAdd[idx] += addVal;
+        }
+    }
+
+    void applySet(int idx, int l, int r, T setVal) {
+        tree[idx] = setVal * (r - l + 1);
+        if (l != r) {
+            lazySet[idx] = setVal;
+            hasLazySet[idx] = true;
+            lazyAdd[idx] = 0;
+        }
+    }
+
+    void build(const vector<T>& arr, int idx, int l, int r) {
+        if (l == r) {
+            tree[idx] = arr[l];
         } else {
-            int tm = (tl + tr) / 2;
-            build(arr, v * 2, tl, tm);
-            build(arr, v * 2 + 1, tm + 1, tr);
-            tree[v] = tree[v * 2] + tree[v * 2 + 1];
+            int mid = (l + r) / 2;
+            build(arr, idx * 2, l, mid);
+            build(arr, idx * 2 + 1, mid + 1, r);
+            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
         }
     }
 
-    void push(int v, int tl, int tr) {
-        int tm = (tl + tr) / 2;
-        if (hasLazySet[v]) {
-            applySet(v * 2, tl, tm, lazySet[v]);
-            applySet(v * 2 + 1, tm + 1, tr, lazySet[v]);
-            hasLazySet[v] = false;
-            lazySet[v] = 0;
-        }
-        if (lazyAdd[v] != 0) {
-            applyAdd(v * 2, tl, tm, lazyAdd[v]);
-            applyAdd(v * 2 + 1, tm + 1, tr, lazyAdd[v]);
-            lazyAdd[v] = 0;
-        }
-    }
-
-    void applyAdd(int v, int tl, int tr, T addVal) {
-        tree[v] += addVal * (tr - tl + 1);
-        if (tl != tr) {
-            lazyAdd[v] += addVal;
-        }
-    }
-
-    void applySet(int v, int tl, int tr, T setVal) {
-        tree[v] = setVal * (tr - tl + 1);
-        if (tl != tr) {
-            lazySet[v] = setVal;
-            hasLazySet[v] = true;
-            lazyAdd[v] = 0;  // clear pending add
-        }
-    }
-
-    void updateAdd(int v, int tl, int tr, int l, int r, T addVal) {
-        if (l > r) return;
-        if (l == tl && r == tr) {
-            applyAdd(v, tl, tr, addVal);
+    void updateAdd(int idx, int l, int r, int left, int right, T addVal) {
+        if (left > right) return;
+        if (left == l && right == r) {
+            applyAdd(idx, l, r, addVal);
         } else {
-            push(v, tl, tr);
-            int tm = (tl + tr) / 2;
-            updateAdd(v * 2, tl, tm, l, min(r, tm), addVal);
-            updateAdd(v * 2 + 1, tm + 1, tr, max(l, tm + 1), r, addVal);
-            tree[v] = tree[v * 2] + tree[v * 2 + 1];
+            push(idx, l, r);
+            int mid = (l + r) / 2;
+            updateAdd(idx * 2, l, mid, left, min(right, mid), addVal);
+            updateAdd(idx * 2 + 1, mid + 1, r, max(left, mid + 1), right, addVal);
+            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
         }
     }
 
-    void updateSet(int v, int tl, int tr, int l, int r, T setVal) {
-        if (l > r) return;
-        if (l == tl && r == tr) {
-            applySet(v, tl, tr, setVal);
+    void updateSet(int idx, int l, int r, int left, int right, T setVal) {
+        if (left > right) return;
+        if (left == l && right == r) {
+            applySet(idx, l, r, setVal);
         } else {
-            push(v, tl, tr);
-            int tm = (tl + tr) / 2;
-            updateSet(v * 2, tl, tm, l, min(r, tm), setVal);
-            updateSet(v * 2 + 1, tm + 1, tr, max(l, tm + 1), r, setVal);
-            tree[v] = tree[v * 2] + tree[v * 2 + 1];
+            push(idx, l, r);
+            int mid = (l + r) / 2;
+            updateSet(idx * 2, l, mid, left, min(right, mid), setVal);
+            updateSet(idx * 2 + 1, mid + 1, r, max(left, mid + 1), right, setVal);
+            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
         }
     }
 
     T query(int idx, int l, int r, int left, int right) {
-        push(idx, l, r);
         if (left == l && right == r)
             return tree[idx];
+        
+        push(idx, l, r);
+        
         int mid = (l + r) / 2;
+        
         if (right <= mid)
             return query(2 * idx, l, mid, left, right);
         else if (left > mid)
             return query(2 * idx + 1, mid + 1, r, left, right);
         else
-            return query(2 * idx, l, mid, left, mid) + 
-                   query(2 * idx + 1, mid + 1, r, mid + 1, right);
+            return combine(
+                query(2 * idx, l, mid, left, mid),
+                query(2 * idx + 1, mid + 1, r, mid + 1, right)
+            );
     }
 
 public:
