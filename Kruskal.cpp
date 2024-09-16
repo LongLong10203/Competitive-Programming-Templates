@@ -1,12 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-class KruskalMST {
-public:
-    struct Edge {
-        int src, dest, weight;
-    };
+struct Edge {
+    int src, dest, weight;
+};
 
+class KruskalMST {
 private:
     vector<Edge> edges;
     int V;
