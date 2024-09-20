@@ -17,12 +17,12 @@ private:
 
     using priority_t = mt19937_64::result_type;
 
-    priority_t next_priority () {
+    priority_t next_priority() {
         priority_t priority = (*rng_)();
         return priority;
     }
 
-    void regenerate_priorities_recursive (vector <int> & new_priors, pnode & t, int l, int r) {
+    void regenerate_priorities_recursive(vector <int> & new_priors, pnode & t, int l, int r) {
         if (!t)
             return;
         t->priority = new_priors[r - 1];
@@ -30,7 +30,7 @@ private:
         regenerate_priorities_recursive(new_priors, t->r, l + cnt(t->l), r - 1);
     }
 
-    void regenerate_priorities () {
+    void regenerate_priorities() {
         int sz = size();
         vector <int> new_priors(sz);
         for (int i = 0; i < sz; i++)
@@ -70,11 +70,11 @@ private:
         node_allocator_.deallocate(t, 1);
     }
 
-    int cnt (pnode t) {
+    int cnt(pnode t) {
         return t ? t->cnt : 0;
     }
 
-    void upd_cnt (pnode t) {
+    void upd_cnt(pnode t) {
         if (t)
             t->cnt = cnt(t->l) + cnt(t->r) + 1;
     }
@@ -136,7 +136,7 @@ private:
         upd_sum(t);
     }
 
-    void split (pnode t, pnode & l, pnode & r, int index) { // split at position
+    void split(pnode t, pnode & l, pnode & r, int index) { // split at position
         if (!t) {
             l = r = 0;
             return;
@@ -154,7 +154,7 @@ private:
         upd_sum(t);
     }
 
-    void split_at (pnode t, pnode & l, pnode & r, T & key, bool & eq) { // split by key
+    void split_at(pnode t, pnode & l, pnode & r, T & key, bool & eq) { // split by key
         if (!t) {
             l = r = 0;
             return;
@@ -179,7 +179,7 @@ private:
         upd_sum(t);
     }
 
-    void insert (pnode & t, pnode it, int index) { // insert at position
+    void insert(pnode & t, pnode it, int index) { // insert at position
         push(t);
         if (!t)
             t = it;
@@ -201,7 +201,7 @@ private:
         upd_sum(t);
     }
 
-    void insert_at (pnode & t, pnode it, bool & eq) { // insert by key
+    void insert_at(pnode & t, pnode it, bool & eq) { // insert by key
         push(t);
         if (!t)
             t = it;
@@ -229,7 +229,7 @@ private:
         upd_sum(t);
     }
 
-    void erase (pnode & t, int index) {
+    void erase(pnode & t, int index) {
         push(t);
         if (cnt(t->l) == index) {
             pnode l = t->l, r = t->r;
@@ -245,7 +245,7 @@ private:
         upd_sum(t);
     }
 
-    void erase_at (pnode & t, T key, bool & found) {
+    void erase_at(pnode & t, T key, bool & found) {
         push(t);
         if (key == t->key) {
             pnode l = t->l, r = t->r;
@@ -262,7 +262,7 @@ private:
         upd_sum(t);
     }
 
-    T get (pnode t, int index) {
+    T get(pnode t, int index) {
         push(t);
         if (index < cnt(t->l))
             return get(t->l, index);
@@ -271,7 +271,7 @@ private:
         return t->key;
     }
 
-    int find (pnode t, T key) {
+    int find(pnode t, T key) {
         push(t);
         if (!t || key == t->key)
             return cnt(t->l);
@@ -281,7 +281,7 @@ private:
             return get(t->r, key) + 1 + cnt(t->l);
     }
 
-    pair <T, int> lower_bound (pnode t, T key, int index) {
+    pair <T, int> lower_bound(pnode t, T key, int index) {
         push(t);
         if (!t)
             return {T(), size()};
@@ -296,7 +296,7 @@ private:
         return lower_bound(t->r, key, index + 1 + cnt(t->l));
     }
 
-    pair <T, int> upper_bound (pnode t, T key, int index) {
+    pair <T, int> upper_bound(pnode t, T key, int index) {
         push(t);
         if (!t)
             return {T(), size()};
@@ -309,7 +309,7 @@ private:
         return upper_bound(t->r, key, index + 1 + cnt(t->l));
     }
 
-    void shift (pnode & t, int l, int r, T add) {
+    void shift(pnode & t, int l, int r, T add) {
         pnode l1, r1;
         split(t, l1, r1, r + 1);
         pnode l2, r2;
@@ -320,7 +320,7 @@ private:
         merge(t, t2, r1);
     }
 
-    void reverse (pnode & t, int l, int r) {
+    void reverse(pnode & t, int l, int r) {
         pnode l1, r1;
         split(t, l1, r1, r + 1);
         pnode l2, r2;
@@ -331,7 +331,7 @@ private:
         merge(t, t2, r1);
     }
 
-    void move (pnode & t, int left, int right, int shift) {
+    void move(pnode & t, int left, int right, int shift) {
         // [l, r) becomes [l+shift, r+shift)
         if (shift == 0)
             return;
@@ -349,7 +349,7 @@ private:
         merge(root_, prefix, tmp);
     }
 
-    T get_sum (pnode & t, int l, int r) {
+    T get_sum(pnode & t, int l, int r) {
         pnode l1, r1;
         split(t, l1, r1, r + 1);
         pnode l2, r2;
@@ -361,7 +361,7 @@ private:
         return ret;
     }
 
-    void clear (pnode & t) {
+    void clear(pnode & t) {
         if (!t)
             return;
         clear(t->l);
@@ -395,7 +395,7 @@ private:
     }
 
 public:
-    Treap (mt19937_64 * rng = nullptr) {
+    Treap(mt19937_64 * rng = nullptr) {
         is_sorted_ = true;
         stop_ = false;
         root_ = nullptr;
@@ -410,7 +410,7 @@ public:
         }
     }
 
-    ~Treap () {
+    ~Treap() {
         if (rng_owner_)
             delete rng_;
         clear(root_);
@@ -422,12 +422,12 @@ public:
 
     bool is_sorted () { return is_sorted_; }
 
-    void srand (mt19937_64::result_type seed) {
+    void srand(mt19937_64::result_type seed) {
         // optional
         rng_->seed(seed);
     }
 
-    bool insert (T x) {
+    bool insert(T x) {
         bool eq = false;
         pnode t = create_node(x);
         stop_ = false;
@@ -442,7 +442,7 @@ public:
         return !eq;
     }
 
-    void insert_at (int pos, T x) {
+    void insert_at(int pos, T x) {
         if (pos > size())
             return;
         pnode t = create_node(x);
@@ -462,23 +462,23 @@ public:
         }
     }
 
-    bool erase (T x) {
+    bool erase(T x) {
         bool found = false;
         erase_at(root_, x, found);
         return found;
     }
 
-    void erase_at (int pos) {
+    void erase_at(int pos) {
         if (pos >= size())
             return;
         erase(root_, pos);
     }
 
-    void clear () {
+    void clear() {
         clear(root_);
     }
 
-    int get_index (T key) {
+    int get_index(T key) {
         if (!is_sorted_)
             return size();
         pnode t = root_;
@@ -497,23 +497,23 @@ public:
         return index;
     }
 
-    T operator[] (int index) {
+    T operator[](int index) {
         return get(root_, index);
     }
 
-    pair <T, int> lower_bound (T x) {
+    pair <T, int> lower_bound(T x) {
         if (!is_sorted_)
             return {T(), size()};
         return lower_bound(root_, x, 0);
     }
 
-    pair <T, int> upper_bound (T x) {
+    pair <T, int> upper_bound(T x) {
         if (!is_sorted_)
             return {T(), size()};
         return upper_bound(root_, x, 0);
     }
 
-    void shift (int left, int right, T x) {
+    void shift(int left, int right, T x) {
         left = max(left, 0);
         right = min(right, size() - 1);
         shift(root_, left, right, x);
@@ -527,7 +527,7 @@ public:
         }
     }
 
-    void reverse (int left, int right) {
+    void reverse(int left, int right) {
         left = max(left, 0);
         right = min(right, size() - 1);
         reverse(root_, left, right);
@@ -535,11 +535,11 @@ public:
             is_sorted_ = false;
     }
 
-    void move (int left, int right, int shift) {
+    void move(int left, int right, int shift) {
         move(root_, left, right, shift);
     }
 
-    T get_sum (int left, int right) {
+    T get_sum(int left, int right) {
         return get_sum(root_, left, right);
     }
 
