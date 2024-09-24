@@ -281,6 +281,15 @@ public:
         return *this;
     }
 
+    // Negation operator
+    BigInt operator-() const {
+        BigInt result = *this;
+        if (result.digits.size() != 1 || result.digits[0] != 0) {
+            result.isNegative = !result.isNegative;
+        }
+        return result;
+    }
+
     // Input/Output
     friend istream& operator>>(istream& in, BigInt& num) {
         string s;
