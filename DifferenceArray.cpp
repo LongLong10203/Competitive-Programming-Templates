@@ -16,9 +16,8 @@ public:
 
     void increment(int l, int r, T value) {
         diff[l] += value;
-        if (r + 1 < diff.size()) {
+        if (r + 1 < diff.size())
             diff[r + 1] -= value;
-        }
     }
 
     vector<T> get() const {
