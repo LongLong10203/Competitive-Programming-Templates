@@ -11,7 +11,7 @@ private:
         while (digits.size() > 1 && digits.back() == 0)
             digits.pop_back();
         if (digits.size() == 1 && digits[0] == 0)
-            isNegative = false; // If the number is zero, it should not be negative
+            isNegative = false;
     }
 
     // Helper functions for absolute addition and subtraction
@@ -51,17 +51,18 @@ private:
         if (a.digits.size() != b.digits.size())
             return a.digits.size() > b.digits.size();
 
-        for (int i = a.digits.size() - 1; i >= 0; --i) {
+        for (int i = a.digits.size() - 1; i >= 0; --i)
             if (a.digits[i] != b.digits[i])
                 return a.digits[i] > b.digits[i];
-        }
 
         return false;
     }
 
 public:
-    // Constructors
+    // Default constructor
     BigInt() : digits(1, 0) {}
+
+    // String constructor
     BigInt(const string& num) {
         isNegative = (num[0] == '-');
         int startIndex = isNegative ? 1 : 0;
@@ -69,6 +70,57 @@ public:
             if (isdigit(num[i]))
                 digits.push_back(num[i] - '0');
         removeLeadingZeros();
+    }
+
+    // Templated constructor for various numeric types
+    template<typename T, typename = enable_if_t<is_arithmetic_v<T>>>
+    BigInt(T num) {
+        // Handle double or float
+        if constexpr (is_floating_point_v<T>) {
+            if (num < 0) {
+                isNegative = true;
+                num = -num;
+            }
+            num = floor(num);
+        }
+        else {
+            if (num < 0) {
+                isNegative = true;
+                num = -num;
+            }
+        }
+        if (num == 0) {
+            digits.push_back(0);
+        } else {
+            while (num > 0) {
+                digits.push_back(static_cast<int>(num) % 10);
+                num = static_cast<int>(num) / 10;
+            }
+        }
+        removeLeadingZeros();
+    }
+
+    template <typename T>
+    operator T() const {
+        T result = 0;
+        T base = 1;
+
+        for (size_t i = 0; i < digits.size(); ++i)
+            result += digits[i] * base;
+            base *= 10;
+
+        if (isNegative)
+            result = -result;
+        return result;
+    }
+
+    operator string() const {
+        string result;
+        if (isNegative && !(digits.size() == 1 && digits[0] == 0))
+            result += '-';
+        for (int i = digits.size() - 1; i >= 0; --i)
+            result += to_string(digits[i]);
+        return result;
     }
 
     // Arithmetic operators
@@ -126,9 +178,8 @@ public:
     // Comparison
     bool operator==(const BigInt& other) const {
         // Special case: both are zero, return true
-        if (digits.size() == 1 && digits[0] == 0 && other.digits.size() == 1 && other.digits[0] == 0) {
+        if (digits.size() == 1 && digits[0] == 0 && other.digits.size() == 1 && other.digits[0] == 0)
             return true;
-        }
         return digits == other.digits && isNegative == other.isNegative;
     }
 
@@ -137,19 +188,15 @@ public:
     }
 
     bool operator<(const BigInt& other) const {
-        if (isNegative != other.isNegative) {
+        if (isNegative != other.isNegative)
             return isNegative;
-        }
 
-        if (digits.size() != other.digits.size()) {
+        if (digits.size() != other.digits.size())
             return isNegative ? digits.size() > other.digits.size() : digits.size() < other.digits.size();
-        }
 
-        for (int i = digits.size() - 1; i >= 0; --i) {
-            if (digits[i] != other.digits[i]) {
+        for (int i = digits.size() - 1; i >= 0; --i)
+            if (digits[i] != other.digits[i])
                 return isNegative ? digits[i] > other.digits[i] : digits[i] < other.digits[i];
-            }
-        }
 
         return false;
     }
@@ -210,9 +257,8 @@ public:
     // Negation operator
     BigInt operator-() const {
         BigInt result = *this;
-        if (result.digits.size() != 1 || result.digits[0] != 0) {
+        if (result.digits.size() != 1 || result.digits[0] != 0)
             result.isNegative = !result.isNegative;
-        }
         return result;
     }
 
