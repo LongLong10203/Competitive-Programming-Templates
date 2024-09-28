@@ -75,7 +75,7 @@ public:
     // Templated constructor for various numeric types
     template<typename T, typename = enable_if_t<is_arithmetic_v<T>>>
     BigInt(T num) {
-        // Handle double or float
+        // Handle double or float -> truncate
         if constexpr (is_floating_point_v<T>) {
             if (num < 0) {
                 isNegative = true;
@@ -100,6 +100,7 @@ public:
         removeLeadingZeros();
     }
 
+    // Conversion operator for various numeric types
     template <typename T>
     operator T() const {
         T result = 0;
@@ -114,6 +115,7 @@ public:
         return result;
     }
 
+    // Conversion operator to string
     operator string() const {
         string result;
         if (isNegative && !(digits.size() == 1 && digits[0] == 0))
@@ -175,7 +177,7 @@ public:
         return result;
     }
 
-    // Comparison
+    // Comparison operators
     bool operator==(const BigInt& other) const {
         // Special case: both are zero, return true
         if (digits.size() == 1 && digits[0] == 0 && other.digits.size() == 1 && other.digits[0] == 0)
@@ -211,6 +213,37 @@ public:
 
     bool operator>=(const BigInt& other) const {
         return !(*this < other);
+    }
+
+    // Overloaded comparison operators for other numeric types
+    template <typename T>
+    bool operator==(const T& other) const {
+        return *this == BigInt(other);
+    }
+
+    template <typename T>
+    bool operator!=(const T& other) const {
+        return *this != BigInt(other);
+    }
+
+    template <typename T>
+    bool operator<(const T& other) const {
+        return *this < BigInt(other);
+    }
+
+    template <typename T>
+    bool operator<=(const T& other) const {
+        return *this <= BigInt(other);
+    }
+
+    template <typename T>
+    bool operator>(const T& other) const {
+        return *this > BigInt(other);
+    }
+
+    template <typename T>
+    bool operator>=(const T& other) const {
+        return *this >= BigInt(other);
     }
 
     // Increment and decrement operators
