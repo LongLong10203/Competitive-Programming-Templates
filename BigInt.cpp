@@ -123,72 +123,6 @@ public:
         return result;
     }
 
-    BigInt operator/(const BigInt& divisor) const {
-        if (divisor == BigInt("0")) {
-            throw invalid_argument("Division by zero!");
-        }
-
-        BigInt dividend = *this;
-        BigInt quotient("0");
-        BigInt current("0");
-        
-        bool resultNegative = (dividend.isNegative != divisor.isNegative);
-        dividend.isNegative = false;
-        BigInt absDivisor = divisor;
-        absDivisor.isNegative = false;
-        
-        vector<int> result;
-
-        for (int i = dividend.digits.size() - 1; i >= 0; --i) {
-            current.digits.insert(current.digits.begin(), dividend.digits[i]);
-            current.removeLeadingZeros();
-
-            int q = 0;
-            while (current >= absDivisor) {
-                current = current - absDivisor;
-                q++;
-            }
-
-            result.push_back(q);
-        }
-
-        reverse(result.begin(), result.end());
-        quotient.digits = result;
-        quotient.removeLeadingZeros();
-        quotient.isNegative = resultNegative && !(quotient.digits.size() == 1 && quotient.digits[0] == 0);
-
-        return quotient;
-    }
-
-    BigInt operator%(const BigInt& other) const {
-        if (other == BigInt("0")) {
-            throw invalid_argument("Division by zero");
-        }
-
-        BigInt dividend = *this;
-        BigInt divisor = other;
-
-        bool isNegativeResult = false;
-        if (dividend.isNegative) {
-            dividend.isNegative = false;
-            isNegativeResult = true;
-        }
-        if (divisor.isNegative) {
-            divisor.isNegative = false;
-        }
-
-        BigInt quotient = dividend / divisor;
-        BigInt product = quotient * divisor;
-        BigInt remainder = dividend - product;
-
-        if (isNegativeResult) {
-            remainder.isNegative = true;
-        }
-
-        remainder.removeLeadingZeros();
-        return remainder;
-    }
-
     // Comparison
     bool operator==(const BigInt& other) const {
         // Special case: both are zero, return true
@@ -270,14 +204,6 @@ public:
 
     BigInt& operator*=(const BigInt& other) {
         *this = *this * other;
-        return *this;
-    }
-
-    BigInt& operator/=(const BigInt& other) {
-        if (other == BigInt("0")) {
-            throw invalid_argument("Division by zero!");
-        }
-        *this = *this / other;
         return *this;
     }
 
