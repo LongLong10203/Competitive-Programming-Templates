@@ -1,11 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template<typename T>
 class Combinatorics {
 private:
-    vector<long long> factMemo;
-    vector<long long> invFactMemo;
-    long long MOD;
+    vector<T> factMemo;
+    vector<T> invFactMemo;
+    T MOD;
 
     void precompute(int maxN) {
         factMemo[0] = 1;
@@ -16,8 +17,8 @@ private:
             invFactMemo[i] = (invFactMemo[i + 1] * (i + 1)) % MOD;
     }
 
-    long long power(long long x, long long y) {
-        long long res = 1;
+    T power(T x, T y) {
+        T res = 1;
         x = x % MOD;
         while (y > 0) {
             if (y & 1) res = (res * x) % MOD;
@@ -28,17 +29,17 @@ private:
     }
 
 public:
-    Combinatorics(int maxN, long long mod) : MOD(mod) {
+    Combinatorics(int maxN, T mod = 1) : MOD(mod) {
         factMemo.resize(maxN + 1);
         invFactMemo.resize(maxN + 1);
         precompute(maxN);
     }
 
-    long long factorial(int n) {
+    T factorial(int n) {
         return factMemo[n];
     }
 
-    long long nCr(int n, int r) {
+    T nCr(int n, int r) {
         if (r > n) throw invalid_argument("r > n");
         return (factMemo[n] * invFactMemo[r] % MOD * invFactMemo[n - r] % MOD) % MOD;
     }
