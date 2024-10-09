@@ -51,6 +51,8 @@ private:
     }
 
 public:
+    SegmentTree() {}
+
     SegmentTree(const vector<T>& input_data) {
         data = input_data;
         n = data.size();
