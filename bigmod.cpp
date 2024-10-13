@@ -13,5 +13,5 @@ long long bigmod(long long base, long long exp, long long MOD) {
 }
 
 int main() {
-
+    
 }

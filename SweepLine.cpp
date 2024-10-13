@@ -1,12 +1,24 @@
 #include <bits/stdc++.h>
 using namespace std;
- 
+
+template<typename T>
+istream& operator>>(istream& is, vector<T>& v) { for (auto& x : v) is >> x; return is; }
+
+template<typename T, typename U>
+istream& operator>>(istream& is, pair<T, U>& p) { return is >> p.first >> p.second; }
+
+template<typename T, size_t N>
+istream& operator>>(istream& is, array<T, N>& a) { for (auto& x : a) is >> x; return is; }
+
+template<typename... T>
+istream& operator>>(istream& is, tuple<T...>& t) { apply([&](auto&&... args) { ((is >> args), ...); }, t); return is; }
+
 template <typename T1, typename T2>
 struct Event {
     T1 l, r;
     T2 cnt;
 };
- 
+
 template <typename T1, typename T2>
 class SweepLine {
 public:
@@ -14,7 +26,7 @@ public:
 
     void add(T1 start, T1 end, T2 inc=1) {
         events[start] += inc;
-        events[end + 1] -= inc;
+        events[end] -= inc;
     }
 
     vector<Event<T1, T2>> cal() {
@@ -46,8 +58,6 @@ private:
     map<T1, T2> events;
     T2 cnt;
 };
-
-typedef long long ll;
 
 int main() {
     
