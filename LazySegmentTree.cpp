@@ -1,124 +1,150 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template<typename T>
+template <typename T>
 class LazySegmentTree {
 private:
+    struct Node {
+        T sum, min, max, lazySet, lazyAdd;
+        bool toSet;
+        Node() : sum(0), min(numeric_limits<T>::max()), max(numeric_limits<T>::min()), lazySet(0), lazyAdd(0), toSet(false) {}
+    };
+
+    vector<Node> tree;
     int n;
-    vector<T> tree, lazyAdd, lazySet;
-    vector<bool> hasLazySet;
 
-    T combine(T left, T right) {
-        return left + right; // only plus operation is supported
-    }
-
-    void push(int idx, int l, int r) {
-        if (hasLazySet[idx]) {
-            applySet(idx * 2, l, (l + r) / 2, lazySet[idx]);
-            applySet(idx * 2 + 1, (l + r) / 2 + 1, r, lazySet[idx]);
-            lazySet[idx] = 0;
-            hasLazySet[idx] = false;
-        }
-
-        if (lazyAdd[idx] != 0) {
-            applyAdd(idx * 2, l, (l + r) / 2, lazyAdd[idx]);
-            applyAdd(idx * 2 + 1, (l + r) / 2 + 1, r, lazyAdd[idx]);
-            lazyAdd[idx] = 0;
-        }
-    }
-
-    void applyAdd(int idx, int l, int r, T addVal) {
-        tree[idx] += addVal * (r - l + 1);
-        if (l != r) {
-            lazyAdd[idx] += addVal;
-        }
-    }
-
-    void applySet(int idx, int l, int r, T setVal) {
-        tree[idx] = setVal * (r - l + 1);
-        if (l != r) {
-            lazySet[idx] = setVal;
-            hasLazySet[idx] = true;
-            lazyAdd[idx] = 0;
-        }
-    }
-
-    void build(const vector<T>& arr, int idx, int l, int r) {
-        if (l == r) {
-            tree[idx] = arr[l];
+    void build(const vector<T>& arr, int v, int tl, int tr) {
+        if (tl == tr) {
+            tree[v].sum = tree[v].min = tree[v].max = arr[tl];
         } else {
-            int mid = (l + r) / 2;
-            build(arr, idx * 2, l, mid);
-            build(arr, idx * 2 + 1, mid + 1, r);
-            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
+            int tm = (tl + tr) / 2;
+            build(arr, v*2, tl, tm);
+            build(arr, v*2+1, tm+1, tr);
+            merge(v);
         }
     }
 
-    void updateAdd(int idx, int l, int r, int left, int right, T addVal) {
-        if (left > right) return;
-        if (left == l && right == r) {
-            applyAdd(idx, l, r, addVal);
+    void applySet(int v, int tl, int tr, T value) {
+        tree[v].sum = value * (tr - tl + 1);
+        tree[v].min = tree[v].max = value;
+        tree[v].lazySet = value;
+        tree[v].lazyAdd = 0;
+        tree[v].toSet = true;
+    }
+
+    void applyAdd(int v, int tl, int tr, T value) {
+        tree[v].sum += value * (tr - tl + 1);
+        tree[v].min += value;
+        tree[v].max += value;
+        if (tree[v].toSet) {
+            tree[v].lazySet += value;
         } else {
-            push(idx, l, r);
-            int mid = (l + r) / 2;
-            updateAdd(idx * 2, l, mid, left, min(right, mid), addVal);
-            updateAdd(idx * 2 + 1, mid + 1, r, max(left, mid + 1), right, addVal);
-            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
+            tree[v].lazyAdd += value;
         }
     }
 
-    void updateSet(int idx, int l, int r, int left, int right, T setVal) {
-        if (left > right) return;
-        if (left == l && right == r) {
-            applySet(idx, l, r, setVal);
+    void push(int v, int tl, int tr) {
+        if (tree[v].toSet) {
+            int tm = (tl + tr) / 2;
+            applySet(v*2, tl, tm, tree[v].lazySet);
+            applySet(v*2+1, tm+1, tr, tree[v].lazySet);
+            tree[v].toSet = false;
+        }
+        if (tree[v].lazyAdd != 0) {
+            int tm = (tl + tr) / 2;
+            applyAdd(v*2, tl, tm, tree[v].lazyAdd);
+            applyAdd(v*2+1, tm+1, tr, tree[v].lazyAdd);
+            tree[v].lazyAdd = 0;
+        }
+    }
+
+    void merge(int v) {
+        tree[v].sum = tree[v*2].sum + tree[v*2+1].sum;
+        tree[v].min = min(tree[v*2].min, tree[v*2+1].min);
+        tree[v].max = max(tree[v*2].max, tree[v*2+1].max);
+    }
+
+    void updateSet(int v, int tl, int tr, int l, int r, T value) {
+        if (l > r) return;
+        if (l == tl && r == tr) {
+            applySet(v, tl, tr, value);
         } else {
-            push(idx, l, r);
-            int mid = (l + r) / 2;
-            updateSet(idx * 2, l, mid, left, min(right, mid), setVal);
-            updateSet(idx * 2 + 1, mid + 1, r, max(left, mid + 1), right, setVal);
-            tree[idx] = combine(tree[idx * 2], tree[idx * 2 + 1]);
+            push(v, tl, tr);
+            int tm = (tl + tr) / 2;
+            updateSet(v*2, tl, tm, l, min(r, tm), value);
+            updateSet(v*2+1, tm+1, tr, max(l, tm+1), r, value);
+            merge(v);
         }
     }
 
-    T query(int idx, int l, int r, int left, int right) {
-        if (left == l && right == r)
-            return tree[idx];
-        
-        push(idx, l, r);
-        
-        int mid = (l + r) / 2;
-        
-        if (right <= mid)
-            return query(2 * idx, l, mid, left, right);
-        else if (left > mid)
-            return query(2 * idx + 1, mid + 1, r, left, right);
-        else
-            return combine(
-                query(2 * idx, l, mid, left, mid),
-                query(2 * idx + 1, mid + 1, r, mid + 1, right)
-            );
+    void updateAdd(int v, int tl, int tr, int l, int r, T value) {
+        if (l > r) return;
+        if (l == tl && r == tr) {
+            applyAdd(v, tl, tr, value);
+        } else {
+            push(v, tl, tr);
+            int tm = (tl + tr) / 2;
+            updateAdd(v*2, tl, tm, l, min(r, tm), value);
+            updateAdd(v*2+1, tm+1, tr, max(l, tm+1), r, value);
+            merge(v);
+        }
+    }
+
+    T querySum(int v, int tl, int tr, int l, int r) {
+        if (l > r) return 0;
+        if (l <= tl && tr <= r) {
+            return tree[v].sum;
+        }
+        push(v, tl, tr);
+        int tm = (tl + tr) / 2;
+        return querySum(v*2, tl, tm, l, min(r, tm)) + querySum(v*2+1, tm+1, tr, max(l, tm+1), r);
+    }
+
+    T queryMin(int v, int tl, int tr, int l, int r) {
+        if (l > r) return numeric_limits<T>::max();
+        if (l <= tl && tr <= r) {
+            return tree[v].min;
+        }
+        push(v, tl, tr);
+        int tm = (tl + tr) / 2;
+        return min(queryMin(v*2, tl, tm, l, min(r, tm)), queryMin(v*2+1, tm+1, tr, max(l, tm+1), r));
+    }
+
+    T queryMax(int v, int tl, int tr, int l, int r) {
+        if (l > r) return numeric_limits<T>::min();
+        if (l <= tl && tr <= r) {
+            return tree[v].max;
+        }
+        push(v, tl, tr);
+        int tm = (tl + tr) / 2;
+        return max(queryMax(v*2, tl, tm, l, min(r, tm)), queryMax(v*2+1, tm+1, tr, max(l, tm+1), r));
     }
 
 public:
     LazySegmentTree(const vector<T>& arr) {
         n = arr.size();
-        tree.resize(n * 4);
-        lazyAdd.resize(n * 4, 0);
-        lazySet.resize(n * 4, 0);
-        hasLazySet.resize(n * 4, false);
+        tree.resize(4 * n);
         build(arr, 1, 0, n - 1);
     }
 
-    void updateAdd(int l, int r, T addVal) {
-        updateAdd(1, 0, n - 1, l, r, addVal);
+    void updateSet(int l, int r, T value) {
+        updateSet(1, 0, n - 1, l, r, value);
     }
 
-    void updateSet(int l, int r, T setVal) {
-        updateSet(1, 0, n - 1, l, r, setVal);
+    void updateAdd(int l, int r, T value) {
+        updateAdd(1, 0, n - 1, l, r, value);
     }
 
-    T query(int l, int r) {
-        return query(1, 0, n - 1, l, r);
+    T querySum(int l, int r) {
+        return querySum(1, 0, n - 1, l, r);
+    }
+
+    T queryMin(int l, int r) {
+        return queryMin(1, 0, n - 1, l, r);
+    }
+
+    T queryMax(int l, int r) {
+        return queryMax(1, 0, n - 1, l, r);
     }
 };
 
