@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// specially designed to solve https://codeforces.com/edu/course/2/lesson/4/2/practice/contest/273278/problem/A
 template <typename T>
-class SegmentTree { // specially designed to solve https://judge.hkoi.org/task/01010 Diamond Chain
+class SegmentTree {
 private:
     struct Node {
         T maxSum, prefixSum, suffixSum, totalSum;
