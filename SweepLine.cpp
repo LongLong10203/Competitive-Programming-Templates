@@ -20,7 +20,7 @@ struct Event {
 };
 
 template <typename T1, typename T2>
-class SweepLine {
+class SweepLine { // experimental
 public:
     SweepLine() : cnt(T2(0)) {}
 

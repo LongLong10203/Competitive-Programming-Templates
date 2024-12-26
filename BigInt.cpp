@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-class BigInt {
+class BigInt { // experimental
 private:
     vector<int> digits;
     vector<bool> binaryDigits;

@@ -10,7 +10,7 @@ using OrdTreeBase = tree<T, null_type, Comp, rb_tree_tag, tree_order_statistics_
 
 // modified from https://codeforces.com/blog/entry/110668
 template<typename T, typename Comp = less<T>>
-class OrderedSet : public OrdTreeBase<T, Comp> {
+class OrderedSet : public OrdTreeBase<T, Comp> { // experimental
 public:
     using Base = OrdTreeBase<T, Comp>;
     

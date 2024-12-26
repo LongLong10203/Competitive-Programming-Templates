@@ -2,7 +2,7 @@
 using namespace std;
 
 template <typename T>
-class SegmentTree {
+class SegmentTree { // specially designed to solve https://judge.hkoi.org/task/01010 Diamond Chain
 private:
     struct Node {
         T maxSum, prefixSum, suffixSum, totalSum;

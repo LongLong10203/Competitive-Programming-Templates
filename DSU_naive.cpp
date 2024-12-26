@@ -3,29 +3,21 @@ using namespace std;
 
 template <typename T>
 class DSU {
-    unordered_map<T, T> parent;
-    unordered_map<T, int> rank;
-    unordered_map<T, int> sz;
+    vector<T> parent;
+    vector<int> rank;
+    vector<int> sz;
 
 public:
-    DSU() = default;
-
-    DSU(const vector<T>& elements) {
-        for (const T& elem : elements) {
-            parent[elem] = elem;
-            rank[elem] = 1;
-            sz[elem] = 1;
-        }
+    DSU(int n) {
+        parent.resize(n);
+        rank.resize(n, 1);
+        sz.resize(n, 1);
+        iota(parent.begin(), parent.end(), 0);
     }
 
     T find(T u) {
-        if (parent.find(u) == parent.end()) { // init
-            parent[u] = u;
-            sz[u] = 1;
-            rank[u] = 1;
-        }
         if (parent[u] != u)
-            parent[u] = find(parent[u]); // path compression
+            parent[u] = find(parent[u]); // Path compression
         return parent[u];
     }
 
@@ -55,7 +47,7 @@ public:
     int size(T u) {
         return sz[find(u)];
     }
-};
+}; // * 0-based index
 
 int main() {
     

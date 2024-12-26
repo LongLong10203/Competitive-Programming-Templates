@@ -2,7 +2,7 @@
 using namespace std;
 
 template <typename T>
-class IntervalTree {
+class IntervalTree { // experimental
 private:
     struct Node {
         T low, high, max;
