@@ -1,50 +1,37 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template <typename T>
 class DSU {
-    vector<T> parent;
-    vector<int> rank;
+    vector<int> lomo;
     vector<int> sz;
 
 public:
     DSU(int n) {
-        parent.resize(n);
-        rank.resize(n, 1);
+        lomo.resize(n);
         sz.resize(n, 1);
-        iota(parent.begin(), parent.end(), 0);
+        iota(lomo.begin(), lomo.end(), 0);
     }
 
-    T find(T u) {
-        if (parent[u] != u)
-            parent[u] = find(parent[u]); // Path compression
-        return parent[u];
+    int find(int u) {
+        return lomo[u] == u ? u : lomo[u] = find(lomo[u]);
     }
 
-    void unite(T u, T v) {
-        T rootU = find(u);
-        T rootV = find(v);
-        if (rootU != rootV) {
-            // unite by rank
-            if (rank[rootU] > rank[rootV]) {
-                parent[rootV] = rootU;
-                sz[rootU] += sz[rootV];
-            } else if (rank[rootU] < rank[rootV]) {
-                parent[rootU] = rootV;
-                sz[rootV] += sz[rootU];
-            } else {
-                parent[rootV] = rootU;
-                sz[rootU] += sz[rootV];
-                rank[rootU]++;
-            }
+    void unite(int u, int v) {
+        int ru = find(u), rv = find(v);
+        if (ru != rv) {
+            // unite by size
+            if (sz[ru] < sz[rv])
+                swap(ru, rv);
+            lomo[rv] = ru;
+            sz[ru] += sz[rv];
         }
     }
 
-    bool same(T u, T v) {
+    bool same(int u, int v) {
         return find(u) == find(v);
     }
 
-    int size(T u) {
+    int size(int u) {
         return sz[find(u)];
     }
 }; // * 0-based index
