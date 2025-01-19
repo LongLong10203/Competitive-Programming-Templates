@@ -18,6 +18,5 @@ template<typename K, typename V>
 using hash_table = gp_hash_table<K, V>;
 
 int main() {
-    ios_base::sync_with_stdio(0); cin.tie(0);
     
 }
