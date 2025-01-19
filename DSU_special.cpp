@@ -1,23 +1,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template <typename T>
 class DSU {
-    vector<int> lomo;
-    vector<int> sz;
+    unordered_map<T, T> lomo;
+    unordered_map<T, int> sz;
 
 public:
-    DSU(int n) {
-        lomo.resize(n);
-        sz.resize(n, 1);
-        iota(lomo.begin(), lomo.end(), 0);
-    }
+    DSU() = default;
 
-    int find(int u) {
+    T find(T u) {
+        if (lomo.find(u) == lomo.end()) { // init
+            lomo[u] = u;
+            sz[u] = 1;
+        }
         return lomo[u] == u ? u : lomo[u] = find(lomo[u]);
     }
 
-    void unite(int u, int v) {
-        int ru = find(u), rv = find(v);
+    void unite(T u, T v) {
+        T ru = find(u), rv = find(v);
         if (ru != rv) {
             // union by size
             if (sz[ru] < sz[rv])
@@ -27,14 +28,14 @@ public:
         }
     }
 
-    bool same(int u, int v) {
+    bool same(T u, T v) {
         return find(u) == find(v);
     }
 
-    int size(int u) {
+    int size(T u) {
         return sz[find(u)];
     }
-}; // * 0-based index
+};
 
 int main() {
     
