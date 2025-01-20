@@ -221,6 +221,58 @@ public:
         val.normalize();
         return in;
     }
+
+    BigInt abs() const {
+        if(number[0] == '-') return BigInt(number.substr(1));
+        return *this;
+    }
+
+    friend BigInt pow(const BigInt &base, int exp, const BigInt &mod = BigInt("0")) {
+        BigInt result = 1;
+        BigInt b = base;
+        while(exp > 0) {
+            if(exp % 2 == 1) {
+                result *= b;
+                if(mod != BigInt("0")) result %= mod;
+            }
+            b *= b;
+            if(mod != BigInt("0")) b %= mod;
+            exp /= 2;
+        }
+        return result;
+    }
+
+    friend BigInt gcd(const BigInt &a, const BigInt &b) {
+        BigInt x = a, y = b;
+        while(y != 0) {
+            BigInt temp = y;
+            y = x % y;
+            x = temp;
+        }
+        return x;
+    }
+
+    BigInt operator%(const BigInt &other) const {
+        BigInt dividend = this->abs();
+        BigInt divisor = other.abs();
+        BigInt quotient = 0;
+        BigInt remainder = 0;
+
+        for (size_t i = 0; i < dividend.number.size(); ++i) {
+            remainder = remainder * 10 + (dividend.number[i] - '0');
+            while (remainder >= divisor) {
+                remainder -= divisor;
+            }
+        }
+
+        if (this->number[0] == '-') remainder = -remainder;
+        return remainder;
+    }
+
+    BigInt& operator%=(const BigInt &other) {
+        *this = *this % other;
+        return *this;
+    }
 };
 
 int main() {
