@@ -222,9 +222,9 @@ public:
         return in;
     }
 
-    BigInt abs() const {
-        if(number[0] == '-') return BigInt(number.substr(1));
-        return *this;
+    friend BigInt abs(const BigInt &val) {
+        if(val.number[0] == '-') return BigInt(val.number.substr(1));
+        return val;
     }
 
     friend BigInt pow(const BigInt &base, int exp, const BigInt &mod = BigInt("0")) {
@@ -253,8 +253,8 @@ public:
     }
 
     BigInt operator%(const BigInt &other) const {
-        BigInt dividend = this->abs();
-        BigInt divisor = other.abs();
+        BigInt dividend = abs(*this);
+        BigInt divisor = abs(other);
         BigInt quotient = 0;
         BigInt remainder = 0;
 
