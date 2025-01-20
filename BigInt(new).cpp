@@ -253,20 +253,19 @@ public:
     }
 
     BigInt operator%(const BigInt &other) const {
-        BigInt dividend = abs(*this);
-        BigInt divisor = abs(other);
-        BigInt quotient = 0;
-        BigInt remainder = 0;
+        BigInt divd = abs(*this);
+        BigInt divs = abs(other);
+        BigInt rem = 0;
 
-        for (size_t i = 0; i < dividend.number.size(); ++i) {
-            remainder = remainder * 10 + (dividend.number[i] - '0');
-            while (remainder >= divisor) {
-                remainder -= divisor;
+        for (size_t i = 0; i < divd.number.size(); ++i) {
+            rem = rem * 10 + (divd.number[i] - '0');
+            while (rem >= divs) {
+                rem -= divs;
             }
         }
 
-        if (this->number[0] == '-') remainder = -remainder;
-        return remainder;
+        if (this->number[0] == '-') rem = -rem;
+        return rem;
     }
 
     BigInt& operator%=(const BigInt &other) {
