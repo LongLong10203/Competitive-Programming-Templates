@@ -269,19 +269,13 @@ public:
         return *this;
     }
 
-    int toInt() const {
-        return stoi(number);
-    }
-
-    long long toLL() const {
-        return stoll(number);
-    }
-
-    string toString() const {
-        return number;
-    }
+    int toInt() const { return stoi(number); }
+    long long toLL() const { return stoll(number); }
+    string toString() const { return number; }
 };
 
 int main() {
+    cin.tie(0)->sync_with_stdio(0);
+
     
 }
