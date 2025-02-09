@@ -3,21 +3,45 @@ using namespace std;
 
 template <typename T>
 class PrefixSum {
-private:
-    vector<T> prefix;
+    vector<T> arr;
 
-public:
-    PrefixSum(const vector<T>& data) {
-        prefix.resize(data.size()+1, 0);
-        for (size_t i = 0; i < data.size(); ++i)
-            prefix[i + 1] = prefix[i] + data[i];
+    void build() {
+        partial_sum(arr.begin(), arr.end(), arr.begin());
     }
 
-    T query(int l, int r) const {
-        return prefix[r + 1] - prefix[l];
+public:
+    PrefixSum() {}
+    PrefixSum(size_t n) {
+        arr.resize(n);
+    }
+    PrefixSum(const vector<T>& v) : arr(v) {
+        build();
+    }
+
+    const vector<T>& get() const {
+        return arr;
+    }
+
+    T query(size_t l, size_t r) const {
+        return (l == 0) ? arr[r] : arr[r] - arr[l - 1];
+    }
+
+    friend ostream& operator<<(ostream& os, const PrefixSum& ps) {
+        for (auto x : ps.arr)
+            os << x << ' ';
+        return os;
+    }
+
+    friend istream& operator>>(istream& is, PrefixSum& ps) {
+        for (auto &x : ps.arr)
+            is >> x;
+            build();
+        return is;
     }
 };
 
 int main() {
+    cin.tie(0)->sync_with_stdio(0);
+
     
 }

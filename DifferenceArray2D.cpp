@@ -1,46 +1,53 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template<typename T>
+template <typename T>
 class DifferenceArray2D {
-    vector<vector<T>> diff;
-
+    vector<vector<T>> arr;
 public:
-    DifferenceArray2D(const vector<vector<T>>& arr) {
-        int n = arr.size(), m = arr[0].size();
-        diff.resize(n + 1, vector<T>(m + 1, 0));
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                diff[i][j] = arr[i][j];
-                if (i > 0) diff[i][j] -= arr[i - 1][j];
-                if (j > 0) diff[i][j] -= arr[i][j - 1];
-                if (i > 0 && j > 0) diff[i][j] += arr[i - 1][j - 1];
-            }
-        }
+    DifferenceArray2D() {}
+    DifferenceArray2D(size_t rows, size_t cols) : arr(rows, vector<T>(cols, 0)) {}
+
+    void increment(size_t r1, size_t c1, size_t r2, size_t c2, T val) {
+        arr[r1][c1] += val;
+        if (r2 + 1 < arr.size()) arr[r2 + 1][c1] -= val;
+        if (c2 + 1 < arr[0].size()) arr[r1][c2 + 1] -= val;
+        if (r2 + 1 < arr.size() && c2 + 1 < arr[0].size()) arr[r2 + 1][c2 + 1] += val;
     }
 
-    void increment(int x1, int y1, int x2, int y2, T value) {
-        diff[x1][y1] += value;
-        if (x2 + 1 < diff.size()) diff[x2 + 1][y1] -= value;
-        if (y2 + 1 < diff[0].size()) diff[x1][y2 + 1] -= value;
-        if (x2 + 1 < diff.size() && y2 + 1 < diff[0].size()) diff[x2 + 1][y2 + 1] += value;
+    void build() {
+        for (auto& row : arr)
+            partial_sum(row.begin(), row.end(), row.begin());
+        for (size_t j = 0; j < arr[0].size(); ++j)
+            for (size_t i = 1; i < arr.size(); ++i)
+                arr[i][j] += arr[i - 1][j];
+    }
+    
+    const vector<vector<T>>& get() const {
+        return arr;
     }
 
-    vector<vector<T>> get() const {
-        int n = diff.size() - 1, m = diff[0].size() - 1;
-        vector<vector<T>> res(n, vector<T>(m));
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                res[i][j] = diff[i][j];
-                if (i > 0) res[i][j] += res[i - 1][j];
-                if (j > 0) res[i][j] += res[i][j - 1];
-                if (i > 0 && j > 0) res[i][j] -= res[i - 1][j - 1];
+    friend ostream& operator<<(ostream& os, const DifferenceArray2D& da) {
+        for (size_t i = 0; i < da.arr.size(); ++i) {
+            for (size_t j = 0; j < da.arr[i].size(); ++j) {
+                os << da.arr[i][j];
+                if (j + 1 < da.arr[i].size()) os << ' ';
             }
+            if (i + 1 < da.arr.size()) os << '\n';
         }
-        return res;
+        return os;
+    }
+
+    friend istream& operator>>(istream& is, DifferenceArray2D& da) {
+        for (auto &row : da.arr)
+            for (auto &x : row)
+                is >> x;
+        return is;
     }
 };
 
 int main() {
+    cin.tie(0)->sync_with_stdio(0);
+
     
 }

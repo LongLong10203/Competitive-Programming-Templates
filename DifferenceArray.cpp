@@ -1,34 +1,42 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-template<typename T>
+template <typename T>
 class DifferenceArray {
-    vector<T> diff;
-
+    vector<T> arr;
 public:
-    DifferenceArray(const vector<T>& arr) {
-        int n = arr.size();
-        diff.resize(n + 1, 0);
-        diff[0] = arr[0];
-        for (int i = 1; i < n; i++)
-            diff[i] = arr[i] - arr[i - 1];
+    DifferenceArray() {}
+    DifferenceArray(size_t n) : arr(n) {}
+
+    void increment(size_t l, size_t r, T val) {
+        arr[l] += val;
+        if (r + 1 < arr.size())
+            arr[r + 1] -= val;
     }
 
-    void increment(int l, int r, T value) {
-        diff[l] += value;
-        if (r + 1 < diff.size())
-            diff[r + 1] -= value;
+    void build() {
+        partial_sum(arr.begin(), arr.end(), arr.begin());
+    }
+    
+    const vector<T>& get() const {
+        return arr;
     }
 
-    vector<T> get() const {
-        vector<T> result(diff.size() - 1);
-        result[0] = diff[0];
-        for (int i = 1; i < result.size(); i++)
-            result[i] = result[i - 1] + diff[i];
-        return result;
+    friend ostream& operator<<(ostream& os, const DifferenceArray& da) {
+        for (auto x : da.arr)
+            os << x << ' ';
+        return os;
+    }
+
+    friend istream& operator>>(istream& is, DifferenceArray& da) {
+        for (auto &x : da.arr)
+            is >> x;
+        return is;
     }
 };
 
 int main() {
+    cin.tie(0)->sync_with_stdio(0);
+
     
 }

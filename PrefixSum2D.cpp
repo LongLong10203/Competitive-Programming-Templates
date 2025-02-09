@@ -3,30 +3,67 @@ using namespace std;
 
 template <typename T>
 class PrefixSum2D {
-private:
-    vector<vector<T>> prefix;
+    vector<vector<T>> arr;
+    size_t rows, cols;
 
-public:
-    PrefixSum2D(const vector<vector<T>>& data) {
-        int rows = data.size();
-        int cols = data[0].size();
-        prefix.resize(rows+1, vector<T>(cols+1, 0));
-        for (int i = 1; i <= rows; ++i)
-            for (int j = 1; j <= cols; ++j)
-                prefix[i][j] = data[i-1][j-1] 
-                             + prefix[i-1][j] 
-                             + prefix[i][j-1] 
-                             - prefix[i-1][j-1];
+    void build() {
+        for (size_t i = 0; i < rows; ++i)
+            partial_sum(arr[i].begin(), arr[i].end(), arr[i].begin());
+        for (size_t j = 0; j < cols; ++j)
+            for (size_t i = 1; i < rows; ++i)
+                arr[i][j] += arr[i - 1][j];
     }
 
-    T query(int r1, int c1, int r2, int c2) const {
-        return prefix[r2+1][c2+1] 
-               - prefix[r1][c2+1] 
-               - prefix[r2+1][c1] 
-               + prefix[r1][c1];
+public:
+    PrefixSum2D() : rows(0), cols(0) {}
+    PrefixSum2D(size_t r, size_t c) : rows(r), cols(c), arr(r, vector<T>(c)) {}
+    PrefixSum2D(const vector<vector<T>>& v) : arr(v), rows(v.size()), cols(v[0].size()) {
+        build();
+    }
+
+    const vector<vector<T>>& get() const {
+        return arr;
+    }
+
+    T query(size_t r1, size_t c1, size_t r2, size_t c2) const {
+        return arr[r2][c2] - (r1 ? arr[r1 - 1][c2] : 0) - (c1 ? arr[r2][c1 - 1] : 0) + (r1 && c1 ? arr[r1 - 1][c1 - 1] : 0);
+    }
+
+    friend ostream& operator<<(ostream& os, const PrefixSum2D& ps) {
+        for (size_t i = 0; i < ps.arr.size(); i++) {
+            for (size_t j = 0; j < ps.arr[i].size(); j++) {
+                os << ps.arr[i][j];
+                if (j + 1 < ps.arr[i].size()) os << ' ';
+            }
+            if (i + 1 < ps.arr.size()) os << '\n';
+        }
+        return os;
+    }
+
+    friend istream& operator>>(istream& is, PrefixSum2D& ps) {
+        for (auto& row : ps.arr)
+            for (auto& x : row)
+                is >> x;
+        ps.build();
+        return is;
     }
 };
 
 int main() {
+    cin.tie(0)->sync_with_stdio(0);
     
+    int n, m;
+    cin >> n >> m;
+
+    PrefixSum2D<int> ps(n, m);
+    cin >> ps;
+
+    int q;
+    cin >> q;
+
+    while (q--) {
+        int r1, c1, r2, c2;
+        cin >> r1 >> c1 >> r2 >> c2;
+        cout << ps.query(r1 - 1, c1 - 1, r2 - 1, c2 - 1) << '\n';
+    }
 }
