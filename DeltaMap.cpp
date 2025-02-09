@@ -11,15 +11,43 @@ public:
         diff[r + 1] -= val;
     }
 
-    int countEqual(U target) {
+    T countEqual(U target) {
         U cur = 0;
-        int count = 0;
+        T count = 0;
         auto it = diff.begin();
         T prev_idx = it->first;
         for (auto &[idx, val] : diff) {
             if (cur == target) {
                 count += (idx - prev_idx);
             }
+            cur += val;
+            prev_idx = idx;
+        }
+        return count;
+    }
+
+    T countMore(U target) {
+        U cur = 0;
+        T count = 0;
+        auto it = diff.begin();
+        T prev_idx = it->first;
+        for (auto &[idx, val] : diff) {
+            if (cur > target)
+                count += (idx - prev_idx);
+            cur += val;
+            prev_idx = idx;
+        }
+        return count;
+    }
+
+    T countLess(U target) {
+        U cur = 0;
+        T count = 0;
+        auto it = diff.begin();
+        T prev_idx = it->first;
+        for (auto &[idx, val] : diff) {
+            if (cur < target)
+                count += (idx - prev_idx);
             cur += val;
             prev_idx = idx;
         }
