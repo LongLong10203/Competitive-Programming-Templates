@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef __int128_t i128;
+typedef __int128 i128;
 
 istream& operator>>(istream& in, i128& num) {
     string s;
