@@ -52,18 +52,5 @@ public:
 int main() {
     cin.tie(0)->sync_with_stdio(0);
     
-    int n, m;
-    cin >> n >> m;
-
-    PrefixSum2D<int> ps(n, m);
-    cin >> ps;
-
-    int q;
-    cin >> q;
-
-    while (q--) {
-        int r1, c1, r2, c2;
-        cin >> r1 >> c1 >> r2 >> c2;
-        cout << ps.query(r1 - 1, c1 - 1, r2 - 1, c2 - 1) << '\n';
-    }
+    
 }
