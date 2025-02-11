@@ -35,7 +35,7 @@ public:
     friend istream& operator>>(istream& is, PrefixSum& ps) {
         for (auto &x : ps.arr)
             is >> x;
-            build();
+        ps.build();
         return is;
     }
 };
@@ -43,5 +43,18 @@ public:
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
-    
+    int n;
+    cin >> n;
+
+    PrefixSum<int> ps(n);
+    cin >> ps;
+
+    int q;
+    cin >> q;
+
+    while (q--) {
+        int l, r;
+        cin >> l >> r;
+        cout << ps.query(l - 1, r - 1) << '\n';
+    }
 }
