@@ -8,6 +8,10 @@ public:
     DifferenceArray() {}
     DifferenceArray(size_t n) : arr(n) {}
 
+    vector<T> operator()() {
+        return arr;
+    }
+
     void increment(size_t l, size_t r, T val) {
         arr[l] += val;
         if (r + 1 < arr.size())
@@ -16,10 +20,6 @@ public:
 
     void build() {
         partial_sum(arr.begin(), arr.end(), arr.begin());
-    }
-    
-    const vector<T>& get() const {
-        return arr;
     }
 
     friend ostream& operator<<(ostream& os, const DifferenceArray& da) {

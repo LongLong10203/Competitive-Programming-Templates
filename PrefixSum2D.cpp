@@ -21,7 +21,7 @@ public:
         build();
     }
 
-    const vector<vector<T>>& get() const {
+    vector<vector<T>> operator()() const {
         return arr;
     }
 

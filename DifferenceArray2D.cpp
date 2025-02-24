@@ -8,6 +8,10 @@ public:
     DifferenceArray2D() {}
     DifferenceArray2D(size_t rows, size_t cols) : arr(rows, vector<T>(cols, 0)) {}
 
+    vector<vector<T>> operator()() const {
+        return arr;
+    }
+
     void increment(size_t r1, size_t c1, size_t r2, size_t c2, T val) {
         arr[r1][c1] += val;
         if (r2 + 1 < arr.size()) arr[r2 + 1][c1] -= val;
@@ -21,10 +25,6 @@ public:
         for (size_t j = 0; j < arr[0].size(); ++j)
             for (size_t i = 1; i < arr.size(); ++i)
                 arr[i][j] += arr[i - 1][j];
-    }
-    
-    const vector<vector<T>>& get() const {
-        return arr;
     }
 
     friend ostream& operator<<(ostream& os, const DifferenceArray2D& da) {

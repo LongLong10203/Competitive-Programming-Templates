@@ -18,7 +18,7 @@ public:
         build();
     }
 
-    const vector<T>& get() const {
+    vector<T> operator()() {
         return arr;
     }
 
