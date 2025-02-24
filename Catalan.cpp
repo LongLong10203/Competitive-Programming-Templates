@@ -57,6 +57,17 @@ template<int _MOD = Constants::MOD> struct Combinatorics {
     Mint factorial(int n) { return fact[n]; }
 };
 
+template<int _MOD = Constants::MOD> struct Catalan {
+    using Mint = Modular<_MOD>;
+    vector<Mint> cat;
+    Catalan(int n) : cat(n + 1) {
+        Combinatorics<_MOD> comb(2 * n);
+        for (int i = 0; i <= n; ++i)
+            cat[i] = comb.nCr(2 * i, i) / (i + 1);
+    }
+    Mint operator[](int i) const { return cat[i]; }
+};
+
 int main() {
     cin.tie(0)->sync_with_stdio(0);
 
