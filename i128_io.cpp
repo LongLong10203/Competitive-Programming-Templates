@@ -2,44 +2,37 @@
 using namespace std;
 typedef __int128 i128;
 
-istream& operator>>(istream& in, i128& num) {
-    string s;
-    in >> s;
-    num = 0;
-    bool neg = false;
-    for (char c : s) {
-        if (c == '-') {
-            neg = true;
-        } else {
-            num = num * 10 + (c - '0');
-        }
-    }
-    if (neg) {
-        num = -num;
-    }
-    return in;
-}
-
-ostream& operator<<(ostream& out, const i128& num) {
-    if (num == 0) {
-        out << '0';
-        return out;
-    }
-    i128 temp = num;
-    if (temp < 0) {
-        out << '-';
-        temp = -temp;
+ostream& operator<<(ostream& os, const i128 &n) {
+    if (n == 0)
+        return os << '0';
+    i128 t = n;
+    if (t < 0) {
+        os << "-";
+        t = -t;
     }
     string s;
-    while (temp > 0) {
-        s += '0' + (temp % 10);
-        temp /= 10;
+    while (t) {
+        s.push_back('0' + (t % 10));
+        t /= 10;
     }
     reverse(s.begin(), s.end());
-    out << s;
-    return out;
+    return os << s;
+}
+
+istream& operator>>(istream& is, i128 &n) {
+    string s;
+    is >> s;
+    n = 0;
+    bool neg = s[0] == '-';
+    for (size_t i = neg ? 1 : 0; i < s.size(); ++i)
+        n = n * 10 + (s[i] - '0');
+    if (neg)
+        n = -n;
+    return is;
 }
 
 int main() {
-    
+    cin.tie(0)->sync_with_stdio(0);
+
+
 }
