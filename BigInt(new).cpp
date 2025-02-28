@@ -252,14 +252,12 @@ public:
         BigInt divd = abs(*this);
         BigInt divs = abs(other);
         BigInt rem = 0;
-
         for (size_t i = 0; i < divd.number.size(); ++i) {
             rem = rem * 10 + (divd.number[i] - '0');
             while (rem >= divs) {
                 rem -= divs;
             }
         }
-
         if (this->number[0] == '-') rem = -rem;
         return rem;
     }
@@ -269,10 +267,43 @@ public:
         return *this;
     }
 
-    int toInt() const { return stoi(number); }
-    long long toLL() const { return stoll(number); }
-    string toString() const { return number; }
-};
+    BigInt operator/(const BigInt &other) const {
+        if (other == BigInt("0"))
+            throw runtime_error("Division by zero");
+        bool neg = (number[0] == '-') ^ (other.number[0] == '-');
+        BigInt dividend = abs(*this), divisor = abs(other);
+        if (dividend < divisor)
+            return BigInt(0);
+        string quotient;
+        BigInt current = 0;
+        for (char digit : dividend.number) {
+            current = current * 10 + BigInt(string(1, digit));
+            int count = 0;
+            while (current >= divisor) {
+                current = current - divisor;
+                count++;
+            }
+            quotient.push_back('0' + count);
+        }
+        size_t pos = 0;
+        while (pos + 1 < quotient.size() && quotient[pos] == '0')
+            pos++;
+        quotient = quotient.substr(pos);
+        if (neg && quotient != "0")
+            quotient.insert(quotient.begin(), '-');
+        return BigInt(quotient);
+    }
+
+    BigInt operator/=(const BigInt &other) {
+        *this = *this / other;
+        return *this;
+    }
+
+    explicit operator int() const { return stoi(number); }
+    explicit operator long long() const { return stoll(number); }
+    explicit operator string() const { return number; }
+    explicit operator bool() const { return number != "0"; }
+}; // BigInt written by Long
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
